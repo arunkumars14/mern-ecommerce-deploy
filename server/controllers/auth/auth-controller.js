@@ -2,13 +2,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 const User = require("../../models/User")
 
-const registerUser = async(req, res) => {
-    const {userName, email, password} = req.body;
-    try{
-        const checkUser = await User.findOne({email})
-        if(checkUser) return res.json({
+const registerUser = async (req, res) => {
+    const { userName, email, password } = req.body;
+    try {
+        const checkUser = await User.findOne({ email })
+        if (checkUser) return res.json({
             success: false,
-            message : "User already exists with same email"
+            message: "User already exists with same email"
         })
 
         const hashPassword = await bcrypt.hash(password, 12)
@@ -21,7 +21,7 @@ const registerUser = async(req, res) => {
             message: "Registration Successful"
         })
 
-    }catch(e){
+    } catch (e) {
         console.log(e);
         res.status(500).json({
             success: false,
@@ -30,24 +30,24 @@ const registerUser = async(req, res) => {
     }
 }
 
-const loginUser = async(req, res) => {
-    const {email, password} = req.body;
-    try{
-        const checkUser = await User.findOne({email})
-        if(!checkUser) return res.json({
+const loginUser = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const checkUser = await User.findOne({ email })
+        if (!checkUser) return res.json({
             success: false,
             message: "User doesn't exist, Please register with your email"
         })
         const checkPasswordMatch = await bcrypt.compare(password, checkUser.password)
-        if(!checkPasswordMatch) return res.json({
+        if (!checkPasswordMatch) return res.json({
             success: false,
             message: "Password is incorrect"
         })
         const token = jwt.sign({
             id: checkUser._id, role: checkUser.role, email: checkUser.email, userName: checkUser.userName
-        }, "CLIENT_SECRET_KEY", {expiresIn: "1d"})
+        }, "CLIENT_SECRET_KEY", { expiresIn: "1d" })
 
-        res.cookie("token", token, {
+        /* res.cookie("token", token, {
             httpOnly: true,
             secure: true
         }).json({
@@ -59,9 +59,21 @@ const loginUser = async(req, res) => {
                 id: checkUser._id,
                 userName: checkUser.userName
             }
-        })    
+        }) */
 
-    }catch(e){
+        res.status(200).json({
+            success: true,
+            message: "Logged in successfully",
+            token,
+            user: {
+                email: checkUser.email,
+                role: checkUser.role,
+                id: checkUser._id,
+                userName: checkUser.userName
+            }
+        })
+
+    } catch (e) {
         console.log(e);
         res.status(500).json({
             success: false,
@@ -77,9 +89,28 @@ const logoutUser = (req, res) => {
     })
 }
 
-const authMiddleware = async(req, res, next)=>{
+/* const authMiddleware = async(req, res, next)=>{
     const token = req.cookies.token
     if(!token) return res.status(401).json({
+        success: false,
+        message: "Unauthorized user"
+    })
+    try {
+        const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(401).json({
+            success: false,
+            message: "Unauthorized user"
+        })
+    }
+} */
+
+const authMiddleware = async (req, res, next) => {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(" ")[1]
+    if (!token) return res.status(401).json({
         success: false,
         message: "Unauthorized user"
     })
@@ -97,4 +128,4 @@ const authMiddleware = async(req, res, next)=>{
 
 
 
-module.exports = {registerUser, loginUser, logoutUser, authMiddleware, }
+module.exports = { registerUser, loginUser, logoutUser, authMiddleware, }
