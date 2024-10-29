@@ -40,7 +40,7 @@ const admiOrderSlice = createSlice({
             })
             .addCase(getAllOrdersForAdmin.fulfilled, (state, action) => {
                 state.isLoading = false
-                state.orderList = action.payload.data
+                state.orderList = action.payload.data.reverse()
             })
             .addCase(getAllOrdersForAdmin.rejected, (state) => {
                 state.isLoading = false

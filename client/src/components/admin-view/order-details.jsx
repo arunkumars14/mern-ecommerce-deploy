@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DialogContent, DialogTitle } from '../ui/dialog'
+import { DialogContent, DialogDescription, DialogTitle } from '../ui/dialog'
 import { Label } from '../ui/label'
 import { Separator } from '../ui/separator'
 import CommonForm from '../common/form'
@@ -36,7 +36,10 @@ function AdminOrderDetailsView({ orderDetails, setOpenDetailsDialog }) {
     }
 
     return (
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] h-[90vh] overflow-y-auto" aria-hidden="false">
+            <DialogDescription className="sr-only">
+                Description of order
+            </DialogDescription>
             <div className="grid gap-6">
                 <div className="grid gap-2">
 
