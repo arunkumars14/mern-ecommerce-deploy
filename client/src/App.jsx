@@ -22,6 +22,7 @@ import { Skeleton } from "./components/ui/skeleton"
 import PaypalReturnPage from "./pages/shopping-view/paypal-return"
 import PaymentSuccessPage from "./pages/shopping-view/payment-success"
 import SearchProducts from "./pages/shopping-view/search"
+import { LoaderCircleIcon } from "lucide-react"
 
 function App() {
  const {isAuthenticated, user, isLoading} = useSelector(state => state.auth)
@@ -34,7 +35,16 @@ function App() {
 
 
 
- if(isLoading) return <Skeleton className="w-[800px] bg-black h-[600px]" />
+ if(isLoading){
+  return (
+    <div className="h-[100vh] w-full flex flex-col justify-center items-center">
+      <LoaderCircleIcon className="animate-spin" size={60} color="black"/>
+      <h1 className="text-6xl font-bold mb-10 mt-10">
+        E-Commerce
+      </h1>
+    </div>
+  )
+ } 
 
 
 
